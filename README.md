@@ -19,7 +19,7 @@ The analysis assumes a quantitative approach, employing both descriptive and inf
 
 ## Repository Structure
 * `analysis_script.R`: The complete, heavily commented master script containing all data preprocessing, statistical hypothesis testing, and graphic generation code.
-* `dataset.csv`: The foundational dataset used for the analysis.
+* `Scores(2).csv`: The foundational dataset used for the analysis.
 
 ## How to Run
 1. Clone this repository or download the files locally.
