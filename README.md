@@ -1,7 +1,7 @@
 # Student Performance Demographics Analysis
 
 ## Overview
-This repository contains the R script and dataset used to evaluate the statistical impact of demographic factors—specifically gender and parental educational background—on student academic performance in Mathematics and Language.
+This repository contains the R script and dataset used to evaluate the statistical impact of demographic factors ,specifically gender and parental educational background on student academic performance in Mathematics and Language.
 
 ## Objective
 The primary goal of this project is to determine if subject-specific mastery is gendered and to statistically quantify the academic advantage associated with a student's home environment, specifically their parent's highest level of education.
