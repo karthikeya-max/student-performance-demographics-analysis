@@ -140,9 +140,3 @@ TukeyHSD(math_anova, "parental_education")
 print("--- Tukey's HSD: Language (Parental Education) ---")
 TukeyHSD(lang_anova, "parental_education")
 
-
-
-
-
-print("--- Tukey's HSD: Language (Parental Education) ---")
-TukeyHSD(lang_anova, "parental_education
