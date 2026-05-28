@@ -1,17 +1,19 @@
 # ==============================================================================
 # Title: Demographic Impact on Academic Performance (Math & Language)
-# Description: Non-parametric statistical analysis of standardized test scores
+# Description: Parametric statistical analysis of standardized test scores
+#              using Two-Way ANOVA and Tukey's HSD.
 # Dataset: Scores(2).csv
-# Author: [Your Name]
+# Author: Karthikeya Ramavittal Madhyanapu
 # ==============================================================================
 
 # 1. Install and Load Required Packages
 # ------------------------------------------------------------------------------
-# install.packages(c("dplyr", "tidyr", "ggplot2", "moments"))
+# install.packages(c("dplyr", "tidyr", "ggplot2", "moments", "car"))
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(moments) # Used for skewness and kurtosis calculations
+library(car)     # Used for Levene's Test
 
 # 2. Data Loading and Pre-Processing
 # ------------------------------------------------------------------------------
@@ -97,62 +99,50 @@ plot_box <- ggplot(df, aes(x = parental_education, y = score, fill = gender)) +
 print(plot_box)
 
 
-# 5. Assumption Testing (Normality of Residuals)
+# 5. Assumption Testing (Normality & Homoscedasticity)
 # ------------------------------------------------------------------------------
 # Fit preliminary linear models to extract residuals
-# (Testing residuals is the correct way to assess parametric assumptions)
+math_model <- lm(score ~ gender * parental_education, data = df_math)
+lang_model <- lm(score ~ gender * parental_education, data = df_lang)
 
-# Math Models
-math_gender_model <- lm(score ~ gender, data = df_math)
-math_edu_model <- lm(score ~ parental_education, data = df_math)
+# A. Shapiro-Wilk Test on extracted residuals
+print("--- Shapiro-Wilk Test: Math Residuals ---")
+shapiro.test(resid(math_model))
 
-# Language Models
-lang_gender_model <- lm(score ~ gender, data = df_lang)
-lang_edu_model <- lm(score ~ parental_education, data = df_lang)
+print("--- Shapiro-Wilk Test: Language Residuals ---")
+shapiro.test(resid(lang_model))
 
-# Shapiro-Wilk test on the extracted residuals
-print("--- Shapiro-Wilk Test: Math Residuals (by Gender) ---")
-shapiro.test(resid(math_gender_model))
+# B. Levene's Test for Homoscedasticity (Equal Variances)
+print("--- Levene's Test: Math ---")
+leveneTest(score ~ gender * parental_education, data = df_math)
 
-print("--- Shapiro-Wilk Test: Math Residuals (by Parental Education) ---")
-shapiro.test(resid(math_edu_model))
-
-print("--- Shapiro-Wilk Test: Language Residuals (by Gender) ---")
-shapiro.test(resid(lang_gender_model))
-
-print("--- Shapiro-Wilk Test: Language Residuals (by Parental Education) ---")
-shapiro.test(resid(lang_edu_model))
+print("--- Levene's Test: Language ---")
+leveneTest(score ~ gender * parental_education, data = df_lang)
 
 
-# 6. Inferential Statistics: Gender (Wilcoxon Rank-Sum Test)
+# 6. Inferential Statistics: Two-Way ANOVA
 # ------------------------------------------------------------------------------
-# Used to compare two independent groups (Male vs Female)
-print("--- Wilcoxon Rank-Sum Test: Math Scores by Gender ---")
-wilcox.test(score ~ gender, data = df_math)
+# Testing main effects (Gender & Education) and their interaction
+print("--- Two-Way ANOVA: Math Scores ---")
+math_anova <- aov(score ~ gender * parental_education, data = df_math)
+summary(math_anova)
 
-print("--- Wilcoxon Rank-Sum Test: Language Scores by Gender ---")
-wilcox.test(score ~ gender, data = df_lang)
+print("--- Two-Way ANOVA: Language Scores ---")
+lang_anova <- aov(score ~ gender * parental_education, data = df_lang)
+summary(lang_anova)
 
 
-# 7. Inferential Statistics: Parental Education (Kruskal-Wallis H-Test)
+# 7. Post-Hoc Analysis: Tukey's Honest Significant Difference (HSD)
 # ------------------------------------------------------------------------------
-# Used to compare more than two independent categorical groups
-print("--- Kruskal-Wallis Test: Math Scores by Parental Education ---")
-kruskal.test(score ~ parental_education, data = df_math)
+# Executed because the main effect for parental education was significant
+print("--- Tukey's HSD: Math (Parental Education) ---")
+TukeyHSD(math_anova, "parental_education")
+print("--- Tukey's HSD: Language (Parental Education) ---")
+TukeyHSD(lang_anova, "parental_education")
 
-print("--- Kruskal-Wallis Test: Language Scores by Parental Education ---")
-kruskal.test(score ~ parental_education, data = df_lang)
 
 
-# 8. Post-Hoc Analysis (Bonferroni Correction)
-# ------------------------------------------------------------------------------
-# Pairwise comparisons strictly executed if Kruskal-Wallis p-value < 0.05
-print("--- Post-Hoc Pairwise Wilcoxon (Bonferroni): Math ---")
-pairwise.wilcox.test(df_math$score, 
-                     df_math$parental_education, 
-                     p.adjust.method = "bonferroni")
 
-print("--- Post-Hoc Pairwise Wilcoxon (Bonferroni): Language ---")
-pairwise.wilcox.test(df_lang$score, 
-                     df_lang$parental_education, 
-                     p.adjust.method = "bonferroni")
+
+print("--- Tukey's HSD: Language (Parental Education) ---")
+TukeyHSD(lang_anova, "parental_education
